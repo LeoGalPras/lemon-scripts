@@ -130,7 +130,7 @@ USE $base
 
 /* exporta los productos que se vendieron en la fecha indicada */
 
-SELECT * FROM v_transactionitems WHERE date=$FECHA;
+SELECT * FROM v_transactionitems WHERE date="$FECHA";
 
 EOF
 
