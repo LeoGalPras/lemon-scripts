@@ -130,7 +130,10 @@ USE $base
 
 /* exporta los productos que se vendieron en la fecha indicada */
 
-SELECT * FROM v_transactionitems WHERE date="$FECHA";
+SELECT v_transactionitems.datetime, v_transactionitems.price, v_transactionitems.disc, v_transactionitems.product_id, v_transactionitems.name, v_transactions.itemcount, v_transactionitems.price, v_transactionitems.cost
+FROM v_transactionitems
+INNER JOIN v_transactions ON v_transactionitems.id = v_transactions.id
+WHERE v_transactionitems.date = "$FECHA"
 
 EOF
 
