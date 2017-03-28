@@ -10,13 +10,14 @@ set -e
 
 lovelia=lovelia-caja
 santiago1=santiago1
+sangoyo=marco-laptop
 antena=192.168.2.30
 
 ### directorio de downloads de la compu, que es de donde proviene el archivo de OpenERP.
 
 dirdown=~/downloads/
 
-### nombre del archivo a importar y modificar 
+### nombre del archivo a importar y modificar
 
 nomarchivo=pos.order.csv
 manual=corregir-manual.csv
@@ -46,7 +47,7 @@ fi
 
 if
 [ -e "/usr/bin/mysql" ];
-then 
+then
 echo "encontrado mysql"
 else
 read -p "Instala mysql-client para proceder" && exit 1
@@ -56,7 +57,7 @@ fi
 
 if
 [ -e "/usr/bin/soffice" ];
-then 
+then
 echo "encontrado libreoffice"
 else
 read -p "Se recomienda instalar libreoffice para ver los productos faltantes"
@@ -70,13 +71,13 @@ clear
 ### Despliega las opciones de computadora para enviar los datos
 
 prompt="Seleccione la computadora para enviar el inventario:"
-options=("$lovelia" "$santiago1")
+options=("$lovelia" "$santiago1" "$sangoyo")
 #options=("$lovelia" )
 
 PS3="$prompt"
 
 select opt in "${options[@]}" "Salir" ; do
-#### para salir con el quit 
+#### para salir con el quit
     if (( REPLY == 1 + ${#options[@]} )) ; then
         exit
 
@@ -109,7 +110,7 @@ echo "borrando los archivos anteriores, espera"  && rm -rf pos.or*
 
 for (( ; ; ))
 do
-echo   
+echo
 sleep 2 && read -p "Por favor entra a OPENERP y  exporta el pedido de venta, recuerda seleccionar la palomita de exportar sólo la selección, solo puedes exportar un archivo a la vez"
 	if [ -e "$dirdown/$nomarchivo" ];
 	then
@@ -126,19 +127,19 @@ clear
 ##
 
 #### convierte el archivo a unix
-dos2unix -- $nomarchivo 
+dos2unix -- $nomarchivo
 
 ## primera parte importa con cat, luego hasta tail lo que hace es fomatear el archivo para que queden dos columnas
 ## la parte de sed es para quitar las comillas, y queden solo la separacion por comas
 
-cat  $nomarchivo | rev | cut -d, -f-2 | rev   | tail -n +2 | sed 's/\"//g' > /tmp/$nomarchivo 
+cat  $nomarchivo | rev | cut -d, -f-2 | rev   | tail -n +2 | sed 's/\"//g' > /tmp/$nomarchivo
 
 #### hace que el usuario revise el archivo
 read -p "Presiona enter para revisar los códigos de los  productos y las cantidades que se van a importar, por favor revisa que sea correcto contra el ticket:"
 
 cat /tmp/$nomarchivo
 
-## pregunta de nuevo 
+## pregunta de nuevo
 
 read -p "Estas seguro de que exportaste el archivo correcto? Presiona s para sí. " -n 1 -r
 echo    # nueva linea
@@ -151,7 +152,7 @@ fi
 
 
 
-#### la siguiente parte importa el archivo importa los productos del programa .csv en una tabla temporal, luego compara esa tabla con la tabla de productos y actualiza 
+#### la siguiente parte importa el archivo importa los productos del programa .csv en una tabla temporal, luego compara esa tabla con la tabla de productos y actualiza
 ####los prodcutos coincidentes.
 
 
@@ -164,17 +165,17 @@ do
 read -p "Seleccionaste enviar el archivo a $opt, ¿Estas seguro de esta opción?. Escribe el nombre de la farmacia a donde lo vas a enviar  para proceder:
 >" CONT
 echo -e "\n"
-	if [ "$CONT" == "$opt" ]; 
+	if [ "$CONT" == "$opt" ];
 	then
 		echo "continuando con la importación, espero que no te hayas equivocado" && break
 	else
 		echo "Corre el programa de nuevo, ten mas cuidado la proxima vez" && exit 1
 	fi
 
-done 
+done
 
 sleep 2
- 
+
 
 ### abre la conexion a la base de datos e importa el archivo.
 ### usa esas opciones para que permita importar desde archivo
@@ -199,7 +200,7 @@ LINES TERMINATED BY '\n'
 
 /* intento sacar el output para los productos que no existen esto tiene que llegar al usuario*/
 
-/*SELECT * 
+/*SELECT *
 FROM temporal, products
 WHERE products.code = temporal.codigo;*/
 
@@ -234,7 +235,7 @@ WHERE NOT EXISTS (
 	WHERE temporal1.codigo = temporal.codigo );
 
 
-/* Actualiza la tabla de logs para reflejar los cambios 
+/* Actualiza la tabla de logs para reflejar los cambios
 INSERT INTO `logs`( `userid`, `date`, `time`, `action`) VALUES (1,CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'Agregado automaticamente por el programa' )
 */
 
@@ -247,7 +248,7 @@ EOF
 
 
 
-read -p  "productos importados" && sleep 2 
+read -p  "productos importados" && sleep 2
 clear
 
 
@@ -277,7 +278,7 @@ fi
 #FROM    tableName
 #GROUP   BY ID
 
-#UPDATE stockqty FROM products where user_id IN 
+#UPDATE stockqty FROM products where user_id IN
 
 #(
 #SELECT codigo,cantidad
@@ -285,5 +286,4 @@ fi
 #INNER JOIN products
 #ON products.code=temporal.codigo;)
 
-#SELECT products.code,products.stockqty + temporal.cantidad AS mytotal FROM products a JOIN temporal b ON products.code=temporal.codigo 
-
+#SELECT products.code,products.stockqty + temporal.cantidad AS mytotal FROM products a JOIN temporal b ON products.code=temporal.codigo
